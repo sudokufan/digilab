@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# Workflow Graph Prototype
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small React + TypeScript + ReactFlow app that renders an ML workflow graph, lets you add nodes dynamically, and validates edges so only compatible connections can be made.
 
-Currently, two official plugins are available:
+## Getting started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open the URL printed by Vite (usually <http://localhost:5173>).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Approach
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+The workflow is modeled as three node types — `data-source`, `transform`, `sink` — displayed as `Load Dataset`, `Train Model`, `Save Model`. Each type declares its display metadata and its allowed downstream connections in a single declarative table ([src/data/nodeConfig.ts](src/data/nodeConfig.ts)).
+
+One generic [WorkflowNode](src/components/WorkflowGraph/WorkflowNode.tsx) component renders all three types, reading its schema from that table based on ReactFlow's native `node.type` field. Adding a new type is one entry in the config — no new component, no new validation branch.
+
+State lives in [WorkflowGraph/index.tsx](src/components/WorkflowGraph/index.tsx) via `useNodesState` / `useEdgesState`. Presentational children ([WorkflowNode](src/components/WorkflowGraph/WorkflowNode.tsx), [AddNodeButton](src/components/WorkflowGraph/AddNodeButton.tsx)) stay dumb and receive data/callbacks via props.
+
+## Design decisions
+
+- **`node.type` is the single source of truth for type.** ReactFlow already has a first-class `type` field that drives the `nodeTypes` map; duplicating it in `data.nodeType` would be a second source of truth. Keeping it on the node itself lets `MLNodeData` stay purely presentational (`{ label, description? }`) and lets future per-type renderers be swapped in with zero refactor.
+
+- **Adjacency rules, not typed ports.** With three node types and one logical input/output each, a `canConnectTo: NodeType[]` list per entry is shorter and clearer than per-handle port typing. Every rule the brief's bonus task needs falls out of the table: no backwards edges, no same-type connections, no step-skipping, no self-loops (self-loop is guarded explicitly in [validation.ts](src/components/WorkflowGraph/validation.ts)).
+
+- **Add Node auto-connects when possible.** The brief's third bullet says the click should "render an edge that allows it to connect to another node", so clicking `Add Node` creates a `transform` node offset from the rightmost existing node _and_ auto-appends an edge from that rightmost node when the adjacency rule permits. If it doesn't (e.g. the rightmost is a `sink`), the node is added standalone and the user can drag-connect manually. `transform` was chosen as the fixed Add Node type because it has both an inbound and outbound rule, so it's usually insertable mid-chain.
+
+- **`isValidConnection` on `<ReactFlow>`.** ReactFlow invokes it during drag, so invalid drops are rejected visually before `onConnect` fires — better UX than rejecting after-the-fact.
+
+- **Tailwind 4 via `@tailwindcss/vite`.** The xyflow stylesheet is imported in [src/index.css](src/index.css) immediately after `@import "tailwindcss"` per the ReactFlow + Tailwind 4 docs, so React Flow's styles win the cascade over Tailwind's resets.
+
+## What I'd improve with more time
+
+- **Node picker UI for Add Node.** Choose the type (and label/description) before adding, instead of always appending a `transform`.
+- **Delete + undo.** ReactFlow's default backspace-delete works but isn't surfaced in the UI, and there's no undo stack.
+- **Unit tests for [validation.ts](src/components/WorkflowGraph/validation.ts).** It's a pure function and the highest-ROI first test — cover the self-loop, same-type, backwards, and step-skip cases.
+- **Cycle detection.** Not needed in the current 3-type topology (the rules form a DAG by construction), but would need a traversal if rules became more permissive.
+- **Node configuration UI.** Click a node to edit its label/description/parameters (dataset path, hyperparameters, etc.).
+- **Persistence.** The graph currently resets on reload; `localStorage` or a backend would make the prototype feel real.
+- **Accessibility pass** on custom handles (keyboard connection, focus rings, ARIA labels).
+
+## Scripts
+
+- `npm run dev` — start Vite dev server
+- `npm run build` — TypeScript check + production build
+- `npm run lint` — ESLint
+- `npm run preview` — preview the built app
