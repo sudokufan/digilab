@@ -10,7 +10,6 @@ import {
   type EdgeChange,
   type Connection,
 } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 
 const initialNodes: Node[] = [
   { id: "n1", position: { x: 0, y: 0 }, data: { label: "Node 1" } },
