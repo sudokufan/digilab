@@ -15,7 +15,7 @@ Open the URL printed by Vite (usually <http://localhost:5173>).
 
 The workflow is modeled as three node types — `data-source`, `transform`, `sink` — displayed as `Load Dataset`, `Train Model`, `Save Model`. Each type declares its display metadata and its allowed downstream connections in a single declarative table ([src/data/nodeConfig.ts](src/data/nodeConfig.ts)).
 
-The canConnectTo value in nodeConfig illustrates one-way connections in order to configure WorkflowNode to show whether an incoming or outgoing handle is present. The [WorkflowNode](src/components/WorkflowNode.tsx) component renders all three types, reading its schema from that table based on ReactFlow's native `node.type` field.
+The `canConnectTo` value in nodeConfig illustrates one-way connections in order to configure WorkflowNode to show whether an incoming or outgoing handle is present. The [WorkflowNode](src/components/WorkflowNode.tsx) component renders all three types, reading its schema from that table based on ReactFlow's native `node.type` field.
 
 The orchestrator lives at [src/pages/WorkflowGraph/index.tsx](src/pages/WorkflowGraph/index.tsx) — it owns graph state (via ReactFlow's internal store in uncontrolled mode) and wires up the Add Node + validation handlers. Presentational children ([WorkflowNode](src/components/WorkflowNode.tsx), [AddNodeButton](src/components/AddNodeButton.tsx)) stay dumb and receive data/callbacks via props. We're in uncontrolled mode so that we always see the latest state by reading ReactFlow's store without being dependent on React's re-renders.
 
@@ -40,5 +40,5 @@ The orchestrator lives at [src/pages/WorkflowGraph/index.tsx](src/pages/Workflow
 
 ## Scripts
 
-- `npm run dev` — start Vite dev server
-- `npm run build` — TypeScript check + production build
+- `npm run dev` to start Vite dev server
+- `npm run build` runs TypeScript check + production build
