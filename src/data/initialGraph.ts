@@ -1,11 +1,6 @@
 import type { Edge, Node } from "@xyflow/react";
 import type { MLNodeData } from "../types/workflow";
 
-// Seed graph: a connected chain (data-source → transform → sink) alongside
-// a second, orphaned data-source. The orphan exists so the user can exercise
-// edge validation by dragging a connection from a freshly added transform to
-// it — and to make it obvious that Add Node can't guess the user's intent
-// when multiple valid predecessors exist.
 export const initialNodes: Node<MLNodeData>[] = [
   {
     id: "1",

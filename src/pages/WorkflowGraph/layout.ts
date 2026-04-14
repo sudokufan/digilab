@@ -2,15 +2,10 @@ import type { Node, XYPosition } from "@xyflow/react";
 
 type Rect = { minX: number; minY: number; maxX: number; maxY: number };
 
-// Approximate card size for the new (unmeasured) node. Existing nodes use
-// their actual measured dimensions when available.
 const DEFAULT_NODE_WIDTH = 200;
 const DEFAULT_NODE_HEIGHT = 100;
 const MARGIN = 40;
 
-// Sampling step for candidate positions. Much smaller than a node so we can
-// land inside gaps between existing nodes even when they don't align to a
-// coarse grid.
 const STEP = 40;
 
 const overlapsAny = (pos: XYPosition, nodes: Node[]): boolean => {
@@ -29,10 +24,6 @@ const overlapsAny = (pos: XYPosition, nodes: Node[]): boolean => {
   });
 };
 
-// Find a position inside `viewport` (flow coords) that doesn't overlap any
-// existing node. Samples a dense grid, picks the candidate closest to the
-// viewport center that both fits within the viewport and doesn't collide.
-// Falls back to the viewport center if every candidate is blocked.
 export const findFreePosition = (nodes: Node[], viewport: Rect): XYPosition => {
   const width = viewport.maxX - viewport.minX;
   const height = viewport.maxY - viewport.minY;
