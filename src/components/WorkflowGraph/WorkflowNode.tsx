@@ -1,33 +1,25 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import type { MLNodeData, NodeType } from "../../types/workflow";
-import {
-  hasIncomingRule,
-  hasOutgoingRule,
-  nodeConfig,
-} from "../../data/nodeConfig";
+import { hasIncomingRule, hasOutgoingRule } from "../../data/nodeConfig";
 
 type WorkflowNodeProps = NodeProps<Node<MLNodeData, NodeType>>;
 
 export const WorkflowNode = ({ type, data }: WorkflowNodeProps) => {
-  const config = nodeConfig[type];
-  const { accent } = config;
-
   return (
     <div
-      className={`min-w-45 rounded-lg border-2 ${accent.border} bg-white shadow-md`}
+      data-node-type={type}
+      className="min-w-45 rounded-lg border-2 border-(--accent-border) bg-white shadow-md"
     >
       {hasIncomingRule(type) && (
         <Handle
           type="target"
           position={Position.Left}
-          className={`h-3 w-3 ${accent.handle} border-2 border-white`}
+          className="h-3 w-3 border-2 border-white bg-(--accent-solid)!"
         />
       )}
 
       <div className="px-4 py-3">
-        <span
-          className={`inline-block rounded px-2 py-0.5 text-[10px] font-mono uppercase tracking-wide ${accent.chipBg} ${accent.chipText}`}
-        >
+        <span className="inline-block rounded px-2 py-0.5 font-mono text-[10px] tracking-wide uppercase bg-(--accent-bg) text-(--accent-fg)">
           {type}
         </span>
         <div className="mt-2 text-sm font-semibold text-slate-900">
@@ -44,7 +36,7 @@ export const WorkflowNode = ({ type, data }: WorkflowNodeProps) => {
         <Handle
           type="source"
           position={Position.Right}
-          className={`h-3 w-3 ${accent.handle} border-2 border-white`}
+          className="h-3 w-3 border-2 border-white bg-(--accent-solid)!"
         />
       )}
     </div>

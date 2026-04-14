@@ -19,8 +19,7 @@ import { WorkflowNode } from "./WorkflowNode";
 import { makeIsValidConnection } from "./validation";
 
 // Defined at module scope so ReactFlow doesn't warn about a new object every render.
-// All three types map to the same component today; kept 1:1 so future divergence
-// (a distinct renderer per type) is a zero-refactor change.
+// All three types map to the same component as of today.
 const nodeTypes = {
   "data-source": WorkflowNode,
   transform: WorkflowNode,
@@ -41,8 +40,7 @@ const WorkflowGraphInner = () => {
   // mutate synchronously via useReactFlow(), which avoids stale-closure bugs
   // on rapid clicks (useNodesState's setters are async via re-render, so
   // back-to-back handleAddNode calls would otherwise all see the same state).
-  const { screenToFlowPosition, getNodes, addNodes, addEdges } =
-    useReactFlow();
+  const { screenToFlowPosition, getNodes, addNodes, addEdges } = useReactFlow();
 
   const isValidConnection = useCallback(
     (c: Connection | Edge) => makeIsValidConnection(getNodes())(c),
