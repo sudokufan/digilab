@@ -1,9 +1,11 @@
 import type { Edge, Node } from "@xyflow/react";
 import type { MLNodeData } from "../types/workflow";
 
-// Fan-in seed: two data sources feed into a single transform, which then
-// feeds a sink. Demonstrates that a node can have multiple inbound edges
-// and motivates why "Add Node" can't guess the user's intended connection.
+// Seed graph: a connected chain (data-source → transform → sink) alongside
+// a second, orphaned data-source. The orphan exists so the user can exercise
+// edge validation by dragging a connection from a freshly added transform to
+// it — and to make it obvious that Add Node can't guess the user's intent
+// when multiple valid predecessors exist.
 export const initialNodes: Node<MLNodeData>[] = [
   {
     id: "1",
@@ -33,6 +35,5 @@ export const initialNodes: Node<MLNodeData>[] = [
 
 export const initialEdges: Edge[] = [
   { id: "e1-3", source: "1", target: "3" },
-  { id: "e2-3", source: "2", target: "3" },
   { id: "e3-4", source: "3", target: "4" },
 ];

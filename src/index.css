@@ -11,15 +11,6 @@ body {
   margin: 0;
 }
 
-/*
- * Per-type accent palette for WorkflowNode. Each node sets data-node-type on
- * its root; these rules cascade --accent-* custom properties to any child
- * that references them via Tailwind's var() shorthand.
- *
- * Color tokens come from Tailwind 4's default theme, which exposes every
- * palette step as a --color-* custom property automatically.
- */
-
 [data-node-type="data-source"] {
   --accent-border: var(--color-emerald-400);
   --accent-solid: var(--color-emerald-500);
