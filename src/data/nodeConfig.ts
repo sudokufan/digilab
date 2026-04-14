@@ -19,11 +19,3 @@ export const nodeConfig: Record<NodeType, NodeConfigEntry> = {
     canConnectTo: [],
   },
 };
-
-export const hasIncomingRule = (type: NodeType): boolean =>
-  (Object.keys(nodeConfig) as NodeType[]).some((t) =>
-    nodeConfig[t].canConnectTo.includes(type),
-  );
-
-export const hasOutgoingRule = (type: NodeType): boolean =>
-  nodeConfig[type].canConnectTo.length > 0;

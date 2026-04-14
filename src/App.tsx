@@ -1,4 +1,4 @@
-import { WorkflowGraph } from "./components/WorkflowGraph";
+import { WorkflowGraph } from "./pages/WorkflowGraph";
 
 const App = () => {
   return (

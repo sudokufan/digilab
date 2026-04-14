@@ -1,6 +1,17 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
-import type { MLNodeData, NodeType } from "../../types/workflow";
-import { hasIncomingRule, hasOutgoingRule } from "../../data/nodeConfig";
+import type { MLNodeData, NodeType } from "../types/workflow";
+import { nodeConfig } from "../data/nodeConfig";
+
+const typesWithIncomingHandle = new Set<NodeType>(
+  (Object.values(nodeConfig) as (typeof nodeConfig)[NodeType][]).flatMap(
+    (entry) => entry.canConnectTo,
+  ),
+);
+const typesWithOutgoingHandle = new Set<NodeType>(
+  (Object.keys(nodeConfig) as NodeType[]).filter(
+    (t) => nodeConfig[t].canConnectTo.length > 0,
+  ),
+);
 
 type WorkflowNodeProps = NodeProps<Node<MLNodeData, NodeType>>;
 
@@ -10,7 +21,7 @@ export const WorkflowNode = ({ type, data }: WorkflowNodeProps) => {
       data-node-type={type}
       className="min-w-45 rounded-lg border-2 border-(--accent-border) bg-white shadow-md"
     >
-      {hasIncomingRule(type) && (
+      {typesWithIncomingHandle.has(type) && (
         <Handle
           type="target"
           position={Position.Left}
@@ -32,7 +43,7 @@ export const WorkflowNode = ({ type, data }: WorkflowNodeProps) => {
         )}
       </div>
 
-      {hasOutgoingRule(type) && (
+      {typesWithOutgoingHandle.has(type) && (
         <Handle
           type="source"
           position={Position.Right}
