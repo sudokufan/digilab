@@ -3,13 +3,12 @@ import type { MLNodeData, NodeType } from "../types/workflow";
 import { nodeConfig } from "../data/nodeConfig";
 
 const typesWithIncomingHandle = new Set<NodeType>(
-  (Object.values(nodeConfig) as (typeof nodeConfig)[NodeType][]).flatMap(
-    (entry) => entry.canConnectTo,
-  ),
+  Object.values(nodeConfig).flatMap((entry) => entry.canConnectTo),
 );
+
 const typesWithOutgoingHandle = new Set<NodeType>(
   (Object.keys(nodeConfig) as NodeType[]).filter(
-    (t) => nodeConfig[t].canConnectTo.length > 0,
+    (type) => nodeConfig[type].canConnectTo.length > 0,
   ),
 );
 
